@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Profile Comparison</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <button onclick="window.location='index.html'">⬅️ Back</button>
+  <h2>Comparing Profiles</h2>
+  <div id="compare-container"></div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const profiles = JSON.parse(localStorage.getItem('profileComparison'));
+      if (!profiles || profiles.length !== 2) {
+        document.getElementById('compare-container').innerHTML =
+          '⚠️ Error loading profiles for comparison.';
+        return;
+      }
+
+      const [profileA, profileB] = profiles;
+      let html = `
+        <div class="comparison">
+          <h3>${profileA.name} vs ${profileB.name}</h3>
+          <table class="global-table">
+            <thead><tr>
+              <th>Key</th>
+              <th>${profileA.name}</th>
+              <th>${profileB.name}</th>
+            </tr></thead>
+            <tbody>`;
+
+      const allKeys = new Set([
+        ...Object.keys(profileA), 
+        ...Object.keys(profileB)
+      ]);
+
+      allKeys.forEach(key => {
+        if (key === 'name') return;
+        const valA = JSON.stringify(profileA[key]);
+        const valB = JSON.stringify(profileB[key]);
+        if (valA !== valB) {
+          html += `<tr>
+            <td>${key}</td>
+            <td class="${getValueClass(valA)}">${valA}</td>
+            <td class="${getValueClass(valB)}">${valB}</td>
+          </tr>`;
+        }
+      });
+
+      html += `</tbody></table></div>`;
+      document.getElementById('compare-container').innerHTML = html;
+    });
+
+    // Helpers for green/red
+    function getValueClass(val) {
+      if (val === 'true' || val === '"on"') return 'value-true';
+      if (val === 'false' || val === '"off"') return 'value-false';
+      return '';
+    }
+  </script>
+</body>
+</html>
