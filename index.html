@@ -9,8 +9,14 @@
   <h1>Moblin Config Comparator</h1>
 
   <div class="warning">
-    ⚠️ the following data contains streamkeys and other sensitive data, only show it to people you trust
+    ⚠️ This will show you <strong>ALL</strong> settings incl. streamkeys, passwords and other sensitive data, only show it to people you trust 
   </div>
+  <ol class="instructions">
+    <li>Go to <code>Moblin &gt; Settings &gt; Import and export settings &gt; Export to Clipboard</code></li>
+    <li>Paste the clipboard into the box below.</li>
+    <li>Click the “Analyze Configuration” button.</li>
+  </ol>
+
 
   <h2>Import from Clipboard</h2>
   <textarea id="json-input" placeholder="Paste your Moblin JSON here…"></textarea>
@@ -19,16 +25,21 @@
   <input type="file" id="file-input" accept=".json">
   <button id="analyze-btn">Analyze Configuration</button>
 
+  <hr>
+  
   <h2>
     Profiles
     <button id="compare-btn">Compare Selected</button>
   </h2>
+  <ul class="instructions">
+    <li>You can compare two Profiles by checking their Box and Click the Compare Button</li>
+  </ul>
   <div class="profiles-wrapper">
     <div id="profiles-top-scroll" class="profiles-scroll"></div>
     <div class="profiles" id="profiles-container"></div>
     <div id="profiles-bottom-scroll" class="profiles-scroll"></div>
   </div>
-
+  <hr>
   <h2>Global Settings</h2>
   <div class="global-settings" id="global-settings"></div>
 

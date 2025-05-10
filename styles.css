@@ -32,6 +32,27 @@ button:hover {
   font-weight: bold;
 }
 
+/* ====== Instruction List ====== */
+.instructions {
+  margin: 1rem 0;
+  padding-left: 1.4rem;
+  color: #ddd;
+}
+.instructions li {
+  margin-bottom: 0.6rem;
+}
+
+/* ====== Instructions Code  ====== */
+.instructions code{
+  display: inline-block;
+  font-size: 1.0rem;             /* larger text */
+  background-color: #1d1c1c;        /* darker bg */
+  color: #fff;
+  padding: 0.2rem 0.5rem;        /* some breathing room */
+  border-radius: 4px;
+  font-family: Consolas, Menlo, Monaco, monospace;
+}
+
 /* ====== Import Area ====== */
 textarea {
   width: 100%;
