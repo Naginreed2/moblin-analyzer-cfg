@@ -6,59 +6,101 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <button onclick="window.location='index.html'">⬅️ Back</button>
+  <!-- Back to root -->
+  <button onclick="window.location='/'">⬅️ Back</button>
   <h2>Comparing Profiles</h2>
   <div id="compare-container"></div>
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const profiles = JSON.parse(localStorage.getItem('profileComparison'));
-      if (!profiles || profiles.length !== 2) {
-        document.getElementById('compare-container').innerHTML =
+      let profiles = JSON.parse(localStorage.getItem('profileComparison') || '[]');
+      if (profiles.length !== 2) {
+        document.getElementById('compare-container').textContent =
           '⚠️ Error loading profiles for comparison.';
         return;
       }
 
-      const [profileA, profileB] = profiles;
-      let html = `
-        <div class="comparison">
-          <h3>${profileA.name} vs ${profileB.name}</h3>
-          <table class="global-table">
-            <thead><tr>
-              <th>Key</th>
-              <th>${profileA.name}</th>
-              <th>${profileB.name}</th>
-            </tr></thead>
-            <tbody>`;
+      // Sort enabled=true first (same order as index)
+      profiles.sort((a, b) =>
+        (a.enabled === b.enabled) ? 0 : (a.enabled ? -1 : 1)
+      );
 
-      const allKeys = new Set([
-        ...Object.keys(profileA), 
-        ...Object.keys(profileB)
-      ]);
+      const [pA, pB] = profiles;
+      const keys = new Set([ ...Object.keys(pA), ...Object.keys(pB) ]);
+      keys.delete('name');
+      keys.delete('streams');
 
-      allKeys.forEach(key => {
-        if (key === 'name') return;
-        const valA = JSON.stringify(profileA[key]);
-        const valB = JSON.stringify(profileB[key]);
-        if (valA !== valB) {
-          html += `<tr>
-            <td>${key}</td>
-            <td class="${getValueClass(valA)}">${valA}</td>
-            <td class="${getValueClass(valB)}">${valB}</td>
-          </tr>`;
-        }
+      // Compute differences
+      const diffs = [];
+      keys.forEach(key => {
+        const vA = pA[key], vB = pB[key];
+        const sA = (typeof vA === 'object') ? JSON.stringify(vA) : String(vA);
+        const sB = (typeof vB === 'object') ? JSON.stringify(vB) : String(vB);
+        if (sA !== sB) diffs.push({ key, valA: vA, valB: vB });
       });
 
-      html += `</tbody></table></div>`;
+      // Order: enabled first, url second, then alpha
+      diffs.sort((a, b) => {
+        const order = { enabled: 1, url: 2 };
+        const oa = order[a.key] || 3, ob = order[b.key] || 3;
+        if (oa !== ob) return oa - ob;
+        return a.key.localeCompare(b.key);
+      });
+
+      // Nested‐table helper
+      function nestedTable(o) {
+        let t = `<table class="global-inner-table">
+          <thead><tr><th>Key</th><th>Value</th></tr></thead><tbody>`;
+        Object.entries(o).forEach(([k, v]) => {
+          if (['string','number','boolean'].includes(typeof v)) {
+            const vs = String(v).toLowerCase();
+            const cls = (vs === 'true' || vs === 'on') ? 'value-true'
+                      : (vs === 'false'|| vs === 'off') ? 'value-false'
+                      : '';
+            t += `<tr><td>${k}</td><td class="${cls}">${v}</td></tr>`;
+          }
+        });
+        t += `</tbody></table>`;
+        return t;
+      }
+
+      // Build HTML
+      let html = `
+        <table class="global-table">
+          <colgroup><col><col><col></colgroup>
+          <thead>
+            <tr><th>Key</th><th>${pA.name}</th><th>${pB.name}</th></tr>
+          </thead>
+          <tbody>`;
+
+      diffs.forEach(d => {
+        // render value cell (nested table if object)
+        const renderCell = v => {
+          if (v && typeof v === 'object') return nestedTable(v);
+          return v;
+        };
+        const cellA = renderCell(d.valA);
+        const cellB = renderCell(d.valB);
+
+        // color‐class for booleans
+        const clsA = (String(d.valA).toLowerCase()==='true'||String(d.valA).toLowerCase()==='on')
+                   ? 'value-true' : (String(d.valA).toLowerCase()==='false'||String(d.valA).toLowerCase()==='off')
+                   ? 'value-false' : '';
+        const clsB = (String(d.valB).toLowerCase()==='true'||String(d.valB).toLowerCase()==='on')
+                   ? 'value-true' : (String(d.valB).toLowerCase()==='false'||String(d.valB).toLowerCase()==='off')
+                   ? 'value-false' : '';
+
+        html += `
+          <tr>
+            <td>${d.key}</td>
+            <td class="${clsA}">${cellA}</td>
+            <td class="${clsB}">${cellB}</td>
+          </tr>`;
+      });
+
+      html += `</tbody></table>`;
       document.getElementById('compare-container').innerHTML = html;
     });
-
-    // Helpers for green/red
-    function getValueClass(val) {
-      if (val === 'true' || val === '"on"') return 'value-true';
-      if (val === 'false' || val === '"off"') return 'value-false';
-      return '';
-    }
   </script>
 </body>
 </html>
