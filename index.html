@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Moblin Config Comparator</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <h1>Moblin Config Comparator</h1>
+
+  <div class="warning">
+    ⚠️ the following data contains streamkeys and other sensitive data, only show it to people you trust
+  </div>
+
+  <h2>Import from Clipboard</h2>
+  <textarea id="json-input" placeholder="Paste your Moblin JSON here…"></textarea>
+  <br>
+  <button id="paste-btn">Load from Clipboard</button>
+  <button id="file-btn">Load from File</button>
+  <input type="file" id="file-input" accept=".json">
+  <button id="analyze-btn">Analyze Configuration</button>
+
+  <h2>Profiles</h2>
+  <div class="profiles-wrapper">
+    <div id="profiles-top-scroll" class="profiles-scroll"></div>
+    <div class="profiles" id="profiles-container"></div>
+    <div id="profiles-bottom-scroll" class="profiles-scroll"></div>
+  </div>
+
+  <h2>Global Settings</h2>
+  <div class="global-settings" id="global-settings"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
